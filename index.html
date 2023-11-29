@@ -1,0 +1,58 @@
+<body>
+    <select id="cityList">
+        <option>Select a City</option>
+    </select>
+    <table id="grid" border="1"></table>
+</body>
+<script>
+
+    let cities = [
+        {
+            name: "Benbrook, TX",
+            latitude: 32.6732,
+            longitude: -97.4606
+        },
+        {
+            name: "Columbia City, OR",
+            latitude: 45.8876553,
+            longitude: -122.8149432
+        },
+        {
+            name: "Dallas, TX",
+            latitude: 32.8208447,
+            longitude: -96.8967067
+        },
+        {
+            name: "Jacksonville, FL",
+            latitude: 30.3451675,
+            longitude: -82.0134488
+        }
+    ];
+
+    cities.forEach(c => cityList.innerHTML += `<option>${c.name}</option>`);
+
+    function drawPeriod(p) {
+        grid.innerHTML += `<tr>
+            <td>${p.name}</td>
+            <td>Temperature ${p.temperature} ${p.temperatureUnit}</td>
+            <td>Winds ${p.windDirection} ${p.windSpeed}</td>
+            <td>${p.shortForecast}</td>
+        </tr>`;
+    }
+
+    cityList.addEventListener("change", e => {
+        const city = cities.find(c => cityList.value == c.name);
+
+        //TODO FETCH https://api.weather.gov/points/32.6791,-97.4641
+        fetch(`https://api.weather.gov/points/${city.latitude},${city.longitude}`)
+            .then(r => r.json())
+            .then(data => {
+                fetch(data.properties.forecast)
+                    .then(r => r.json())
+                    .then(forecast => {
+                        forecast.properties.periods.forEach(drawPeriod);
+                    })
+            })
+    });
+
+</script>
